@@ -37,6 +37,7 @@ actor TestActor {
 
 // CHECK: Test Suite 'AsyncAwaitTests' started at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 
+@available(macOS 12.0, *)
 class AsyncAwaitTests: XCTestCase {
     
     lazy var subject = TestActor()
@@ -141,6 +142,7 @@ class AsyncAwaitTests: XCTestCase {
     }
 }
 
+@available(macOS 12.0, *)
 private extension AsyncAwaitTests {
     
     func makeString() async -> String {
@@ -174,7 +176,9 @@ private extension AsyncAwaitTests {
 // CHECK: Test Suite '.*\.xctest' failed at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 // CHECK: \t Executed 8 tests, with 4 failures \(3 unexpected\) in \d+\.\d+ \(\d+\.\d+\) seconds
 
-XCTMain([testCase(AsyncAwaitTests.allTests)])
+if #available(macOS 12.0, *) {
+    XCTMain([testCase(AsyncAwaitTests.allTests)])
+}
 
 // CHECK: Test Suite 'All tests' failed at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 // CHECK: \t Executed 8 tests, with 4 failures \(3 unexpected\) in \d+\.\d+ \(\d+\.\d+\) seconds

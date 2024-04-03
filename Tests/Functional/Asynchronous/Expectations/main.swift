@@ -96,6 +96,7 @@ class ExpectationsTestCase: XCTestCase {
 
 // CHECK: Test Case 'ExpectationsTestCase.test_multipleExpectations_async' started at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 // CHECK: Test Case 'ExpectationsTestCase.test_multipleExpectations_async' passed \(\d+\.\d+ seconds\)
+    @available(macOS 12.0, *)
     func test_multipleExpectations_async() async {
         let foo = expectation(description: "foo")
         let bar = XCTestExpectation(description: "bar")
@@ -551,6 +552,7 @@ class ExpectationsTestCase: XCTestCase {
 
 // CHECK: Test Case 'ExpectationsTestCase.test_waitForExpectationsAsync' started at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 // CHECK: Test Case 'ExpectationsTestCase.test_waitForExpectationsAsync' passed \(\d+\.\d+ seconds\)
+    @available(macOS 12.0, *)
     func test_waitForExpectationsAsync() async {
         // Basic check that waitForExpectations() is functional when used with the
         // await keyword in an async function.
@@ -561,6 +563,7 @@ class ExpectationsTestCase: XCTestCase {
 
 // CHECK: Test Case 'ExpectationsTestCase.test_waitForExpectationsFromMainActor' started at \d+-\d+-\d+ \d+:\d+:\d+\.\d+
 // CHECK: Test Case 'ExpectationsTestCase.test_waitForExpectationsFromMainActor' passed \(\d+\.\d+ seconds\)
+    @available(macOS 12.0, *)
     func test_waitForExpectationsFromMainActor() async {
         await MainActor.run {
             // Basic check that waitForExpectations() is functional and does not need
@@ -571,8 +574,9 @@ class ExpectationsTestCase: XCTestCase {
         }
     }
 
-    static var allTests = {
-        return [
+    static var allTests: [(String, (ExpectationsTestCase) -> () throws -> Void)] = {
+        var tests: [(String, (ExpectationsTestCase) -> () throws -> Void)] = []
+        tests += [
             ("test_waitingForAnUnfulfilledExpectation_fails", test_waitingForAnUnfulfilledExpectation_fails),
             ("test_waitingForUnfulfilledExpectations_outputsAllExpectations_andFails", test_waitingForUnfulfilledExpectations_outputsAllExpectations_andFails),
             ("test_waitingForAnImmediatelyFulfilledExpectation_passes", test_waitingForAnImmediatelyFulfilledExpectation_passes),
@@ -580,18 +584,28 @@ class ExpectationsTestCase: XCTestCase {
             ("test_waitingForAnExpectationFulfilledAfterTheTimeout_fails", test_waitingForAnExpectationFulfilledAfterTheTimeout_fails),
             ("test_whenTimeoutIsImmediate_andAllExpectationsAreFulfilled_passes", test_whenTimeoutIsImmediate_andAllExpectationsAreFulfilled_passes),
             ("test_whenTimeoutIsImmediate_butNotAllExpectationsAreFulfilled_fails", test_whenTimeoutIsImmediate_butNotAllExpectationsAreFulfilled_fails),
+        ]
 
-            // Multiple Expectations
+        // Multiple Expectations
+        tests += [
             ("test_multipleExpectations", test_multipleExpectations),
-            ("test_multipleExpectations_async", asyncTest(test_multipleExpectations_async)),
+        ]
+        if #available(macOS 12.0, *) {
+            tests += [
+                ("test_multipleExpectations_async", asyncTest(test_multipleExpectations_async)),
+            ]
+        }
+        tests += [
             ("test_multipleExpectationsEnforceOrderingCorrect", test_multipleExpectationsEnforceOrderingCorrect),
             ("test_multipleExpectationsEnforceOrderingCorrectBeforeWait", test_multipleExpectationsEnforceOrderingCorrectBeforeWait),
             ("test_multipleExpectationsEnforceOrderingIncorrect", test_multipleExpectationsEnforceOrderingIncorrect),
             ("test_multipleExpectationsIncludingInvertedEnforceOrderingIncorrect", test_multipleExpectationsIncludingInvertedEnforceOrderingIncorrect),
             ("test_multipleExpectationsEnforceOrderingIncorrectBeforeWait", test_multipleExpectationsEnforceOrderingIncorrectBeforeWait),
             ("test_multipleExpectationsEnforceOrderingStressTest", test_multipleExpectationsEnforceOrderingStressTest),
+        ]
 
-            // Inverse Expectations
+        // Inverse Expectations
+        tests += [
             ("test_inverseExpectationPass", test_inverseExpectationPass),
             ("test_inverseExpectationFail", test_inverseExpectationFail),
             ("test_inverseExpectationFulfilledBeforeWait", test_inverseExpectationFulfilledBeforeWait),
@@ -599,35 +613,51 @@ class ExpectationsTestCase: XCTestCase {
             ("test_combiningInverseAndStandardExpectationsFailWithTimeout", test_combiningInverseAndStandardExpectationsFailWithTimeout),
             ("test_combiningInverseAndStandardExpectationsFailWithInverseFulfillment", test_combiningInverseAndStandardExpectationsFailWithInverseFulfillment),
             ("test_combiningInverseAndStandardExpectationsWithOrderingEnforcement", test_combiningInverseAndStandardExpectationsWithOrderingEnforcement),
+        ]
 
-            // Counted Expectations
+        // Counted Expectations
+        tests += [
             ("test_countedConditionPass", test_countedConditionPass),
             ("test_countedConditionPassBeforeWaiting", test_countedConditionPassBeforeWaiting),
             ("test_countedConditionFail", test_countedConditionFail),
+        ]
 
-            // assertForOverFulfill
+        // assertForOverFulfill
+        tests += [
             ("test_assertForOverfulfill_disabled", test_assertForOverfulfill_disabled),
             ("test_assertForOverfulfill_failure", test_assertForOverfulfill_failure),
+        ]
 
-            // Interrupted Waiters
+        // Interrupted Waiters
+        tests += [
 //            ("test_outerWaiterTimesOut_InnerWaitersAreInterrupted", test_outerWaiterTimesOut_InnerWaitersAreInterrupted),
             ("test_outerWaiterCompletes_InnerWaiterTimesOut", test_outerWaiterCompletes_InnerWaiterTimesOut),
+        ]
 
-            // Waiter Conveniences
+        // Waiter Conveniences
+        tests += [
             ("test_classWait", test_classWait),
             ("test_classWaitEnforcingOrder", test_classWaitEnforcingOrder),
             ("test_classWaitInverseExpectationFail", test_classWaitInverseExpectationFail),
+        ]
 
-            // Regressions
+        // Regressions
+        tests += [
             ("test_fulfillmentOnSecondaryThread", test_fulfillmentOnSecondaryThread),
             ("test_expectationCreationOnSecondaryThread", test_expectationCreationOnSecondaryThread),
             ("test_expectationCreationWhileWaiting", test_expectationCreationWhileWaiting),
             ("test_runLoopInsideDispatch", test_runLoopInsideDispatch),
-
-            // waitForExpectations() + @MainActor
-            ("test_waitForExpectationsAsync", asyncTest(test_waitForExpectationsAsync)),
-            ("test_waitForExpectationsFromMainActor", asyncTest(test_waitForExpectationsFromMainActor)),
         ]
+
+        // waitForExpectations() + @MainActor
+        if #available(macOS 12.0, *) {
+            tests += [
+                ("test_waitForExpectationsAsync", asyncTest(test_waitForExpectationsAsync)),
+                ("test_waitForExpectationsFromMainActor", asyncTest(test_waitForExpectationsFromMainActor)),
+            ]
+        }
+
+        return tests
     }()
 }
 // CHECK: Test Suite 'ExpectationsTestCase' failed at \d+-\d+-\d+ \d+:\d+:\d+\.\d+

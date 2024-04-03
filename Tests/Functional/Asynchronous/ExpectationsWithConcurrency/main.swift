@@ -6,7 +6,9 @@
     import XCTest
 #endif
 
-let expectation = XCTestExpectation()
-Task.detached {
-    expectation.fulfill()
+if #available(macOS 10.15, *) {
+    let expectation = XCTestExpectation()
+    Task.detached {
+        expectation.fulfill()
+    }
 }
